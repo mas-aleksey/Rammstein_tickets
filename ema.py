@@ -1,4 +1,8 @@
 from gateway import DB
+import logging
+
+
+logger = logging.getLogger('EmaModule')
 
 
 class EmaModule:
@@ -8,6 +12,7 @@ class EmaModule:
 
     def init(self, price):
         ema = self.gateway.get_ema()
+        logger.info('init ema {}'.format(str(ema)))
         if not ema:
             self.gateway.set_ema({1: price, 200: price, 750: price, 1500: price})
 
@@ -15,6 +20,7 @@ class EmaModule:
         return self.gateway.get_ema()
 
     def update(self, value):
+        logger.info('update ema last price {}'.format(value))
         ema_dict = self.gateway.get_ema()
         new_ema_dict = {p: self.calc_ema(value, p, v) for p, v in ema_dict.items()}
         self.gateway.set_ema(new_ema_dict)

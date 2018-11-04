@@ -1,4 +1,3 @@
-import datetime
 import requests
 import logging
 from ema import EmaModule
