@@ -39,7 +39,7 @@ class TelegramBot:
         self.stop_timer()
 
     def show_ema(self, bot, update):
-        bot.send_message(chat_id=update.chat_id, text=self.worker.get_ema())
+        bot.send_message(chat_id=update.message.chat_id, text=self.worker.get_ema())
 
     @staticmethod
     def help(bot, update):
