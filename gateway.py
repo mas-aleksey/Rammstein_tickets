@@ -2,7 +2,7 @@ import psycopg2
 import logging
 import os
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("Gateway")
 ema_tab = """CREATE TABLE IF NOT EXISTS ema_dict (
                     period integer PRIMARY KEY NOT NULL, 
                     ema_value float)"""
@@ -23,6 +23,7 @@ class DB:
             logger.error('db connection error: {}'.format(e))
         else:
             self.is_connection = True
+            logger.info('Success DB connection')
             return conn
 
     def create_tab(self):

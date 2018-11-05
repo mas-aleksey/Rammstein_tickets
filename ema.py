@@ -11,20 +11,26 @@ class EmaModule:
         self.init(last_price)
 
     def init(self, price):
+        logger.info('init ema...')
         ema = self.gateway.get_ema()
-        logger.info('init ema {}'.format(str(ema)))
         if not ema:
             self.gateway.set_ema({1: price, 200: price, 750: price, 1500: price})
+            logger.info('set new ema with price: {}'.format(price))
+        else:
+            logging.info('ema already exist: {}'.format(ema))
 
     def get(self):
         return self.gateway.get_ema()
 
     def update(self, value):
-        logger.info('update ema last price {}'.format(value))
-        ema_dict = self.gateway.get_ema()
-        new_ema_dict = {p: self.calc_ema(value, p, v) for p, v in ema_dict.items()}
-        self.gateway.set_ema(new_ema_dict)
-        return new_ema_dict
+        try:
+            ema_dict = self.gateway.get_ema()
+            new_ema_dict = {p: self.calc_ema(value, p, v) for p, v in ema_dict.items()}
+            self.gateway.set_ema(new_ema_dict)
+        except Exception as e:
+            logger.error('update ema error: {}'.format(e))
+        else:
+            return new_ema_dict
 
     @staticmethod
     def calc_ema(value, period, old_ema):

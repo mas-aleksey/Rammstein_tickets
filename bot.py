@@ -26,8 +26,7 @@ class TelegramBot:
         self.dp.add_handler(CommandHandler('start', self.start))
         self.dp.add_handler(CommandHandler('stop', self.stop))
         self.dp.add_handler(CommandHandler('help', self.help))
-
-        self.dp.add_handler(CommandHandler('showema', self.show_ema))
+        self.dp.add_handler(CommandHandler('ema', self.show_ema))
         self.dp.add_error_handler(self.error)
 
     def start(self, bot, update):

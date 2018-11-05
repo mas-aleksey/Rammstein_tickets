@@ -21,10 +21,15 @@ class Worker:
         try:
             url = 'https://api.bitfinex.com/v1/pubticker/{}'.format(pair)
             response = requests.request("GET", url)
-            return float(response.json()['last_price'])
+            last_price = float(response.json()['last_price'])
         except Exception as e:
             logger.error("In func: get_last_price for pair %s: %s" % pair, e)
+        else:
+            return last_price
 
     def return_ema_format(self):
         ema = self.ema_dict.get()
-        return '\n'.join('{}: {}'.format(*p) for p in ema.items())
+        if ema:
+            return '\n'.join('{}: {}'.format(*p) for p in ema.items())
+        else:
+            return 'ошибка при получении ema'
