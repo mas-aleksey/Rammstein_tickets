@@ -29,7 +29,4 @@ class Worker:
 
     def return_ema_format(self):
         ema = self.ema_dict.get()
-        if ema:
-            return '\n'.join('{}: {}'.format(*p) for p in ema.items())
-        else:
-            return 'ошибка при получении ema'
+        return '\n'.join('{}: {}'.format(*p) for p in ema.items())

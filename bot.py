@@ -38,9 +38,13 @@ class TelegramBot:
         self.stop_timer()
 
     def show_ema(self, bot, update):
-        ema = self.worker.return_ema_format()
-        logger.info('Show ema: {}'.format(ema))
-        bot.send_message(chat_id=update.message.chat_id, text=ema)
+        try:
+            ema = self.worker.return_ema_format()
+        except Exception as e:
+            logger.error('get ema error {}'.format(e))
+            bot.send_message(chat_id=update.message.chat_id, text='error')
+        else:
+            bot.send_message(chat_id=update.message.chat_id, text=ema)
 
     @staticmethod
     def help(bot, update):
