@@ -39,7 +39,7 @@ class TelegramBot:
 
     def show_ema(self, bot, update):
         ema = self.worker.return_ema_format()
-        logger.info('show ema: {}'.format(ema))
+        logger.info('Show ema: {}'.format(ema))
         bot.send_message(chat_id=update.message.chat_id, text=ema)
 
     @staticmethod
