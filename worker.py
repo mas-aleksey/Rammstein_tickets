@@ -1,20 +1,23 @@
 import requests
 import logging
+from gateway import DB
 from ema import EmaModule
+from strat_control import StrategyModule
 
 logger = logging.getLogger('Worker')
 
 
 class Worker:
-    def __init__(self, bot):
-        self.telega = bot
+    def __init__(self):
         self.pair = 'BTCUSD'
-        self.ema_dict = EmaModule(self.get_last_price(self.pair))
+        self.gateway = DB()
+        self.ema_dict = EmaModule(self.gateway, self.get_last_price(self.pair))
+        self.strategies = StrategyModule(self.gateway)
 
     def process(self):
         price = self.get_last_price(self.pair)
-        self.ema_dict.update(price)
-        #self.telega.push('sec: {}, price: {}'.format(datetime.datetime.now(), price))
+        new_ema = self.ema_dict.update(price)
+        #self.strategies.process(new_ema)
 
     @staticmethod
     def get_last_price(pair):

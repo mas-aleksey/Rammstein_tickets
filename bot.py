@@ -18,24 +18,22 @@ class TelegramBot:
         self.updater = Updater(token=token)
         self.dp = self.updater.dispatcher
         self.add_bot_handlers()
+        self.start_timer()
         logger.info('Start polling')
         self.updater.start_polling(poll_interval=2, timeout=30, read_latency=5)
         self.updater.idle()
 
     def add_bot_handlers(self):
         self.dp.add_handler(CommandHandler('start', self.start))
-        self.dp.add_handler(CommandHandler('stop', self.stop))
         self.dp.add_handler(CommandHandler('help', self.help))
         self.dp.add_handler(CommandHandler('ema', self.show_ema))
         self.dp.add_error_handler(self.error)
+        time.sleep(15)
 
     def start(self, bot, update):
-        bot.send_message(chat_id=update.message.chat_id, text='start')
-        self.start_timer(update.message.chat_id)
-
-    def stop(self, bot, update):
-        bot.send_message(chat_id=update.message.chat_id, text='stop')
-        self.stop_timer()
+        if not self.sender:
+            self.sender = SendMsg(self.token, update.message.chat_id)
+        bot.send_message(chat_id=update.message.chat_id, text=str(update.message.chat_id))
 
     def show_ema(self, bot, update):
         try:
@@ -54,15 +52,13 @@ class TelegramBot:
     def error(bot, update, err):
         logger.warning('Update "%s" caused error "%s"' % (update, err))
 
-    def start_timer(self, chat_id):
-        if not self.sender:
-            self.sender = SendMsg(self.token, chat_id)
+    def start_timer(self):
         if not self.worker:
-            self.sender.push('Запуск процесса')
-            self.worker = Worker(self.sender)
+            logger.info('Start process')
+            self.worker = Worker()
             self.timer.start()
         else:
-            self.sender.push('Процесс уже выполняется')
+            logger.info('Already started')
 
     def stop_timer(self):
         self.timer.stop()

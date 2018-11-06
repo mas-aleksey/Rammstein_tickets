@@ -1,4 +1,3 @@
-from gateway import DB
 import logging
 
 
@@ -6,8 +5,8 @@ logger = logging.getLogger('EmaModule')
 
 
 class EmaModule:
-    def __init__(self, last_price):
-        self.gateway = DB()
+    def __init__(self, gateway, last_price):
+        self.gateway = gateway
         self.init(last_price)
 
     def init(self, price):
