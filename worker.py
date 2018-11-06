@@ -8,16 +8,24 @@ logger = logging.getLogger('Worker')
 
 
 class Worker:
-    def __init__(self):
+    def __init__(self, bot):
+        self.telega = bot
         self.pair = 'BTCUSD'
         self.gateway = DB()
         self.ema_dict = EmaModule(self.gateway, self.get_last_price(self.pair))
         #self.strategies = StrategyModule(self.gateway)
 
     def process(self):
-        price = self.get_last_price(self.pair)
-        new_ema = self.ema_dict.update(price)
-        #self.strategies.process(new_ema)
+        try:
+            price = self.get_last_price(self.pair)
+            new_ema = self.ema_dict.update(price)
+            #self.strategies.process(new_ema)
+        except Exception as e:
+            logger.error('Worker process error: {}'.format(e))
+
+    def return_ema_format(self):
+        ema = self.ema_dict.get()
+        return '\n'.join('{}: {}'.format(*p) for p in ema.items())
 
     @staticmethod
     def get_last_price(pair):
@@ -29,7 +37,3 @@ class Worker:
             logger.error("In func: get_last_price for pair %s: %s" % pair, e)
         else:
             return last_price
-
-    def return_ema_format(self):
-        ema = self.ema_dict.get()
-        return '\n'.join('{}: {}'.format(*p) for p in ema.items())

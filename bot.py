@@ -11,13 +11,12 @@ logger = logging.getLogger('Telegram_Bot')
 
 class TelegramBot:
     def __init__(self, token):
-        self.timer = RepeatEvery(1, self.timer_func)
-        self.token = token
-        self.sender = SendMsg(token, 134751583)
         time.sleep(15)
-        self.worker = None
+        self.token = token
+        self.timer = RepeatEvery(1, self.timer_func)
+        self.sender = SendMsg(token, 134751583)
+        self.worker = Worker(self.sender)
         self.updater = Updater(token=token)
-        self.dp = self.updater.dispatcher
         self.add_bot_handlers()
         self.start_timer()
         logger.info('Start polling')
@@ -25,13 +24,9 @@ class TelegramBot:
         self.updater.idle()
 
     def add_bot_handlers(self):
-        self.dp.add_handler(CommandHandler('start', self.start))
-        self.dp.add_handler(CommandHandler('help', self.help))
-        self.dp.add_handler(CommandHandler('ema', self.show_ema))
-        self.dp.add_error_handler(self.error)
-
-    def start(self, bot, update):
-        bot.send_message(chat_id=update.message.chat_id, text='start')
+        dp = self.updater.dispatcher
+        dp.add_handler(CommandHandler('ema', self.show_ema))
+        dp.add_error_handler(self.error)
 
     def show_ema(self, bot, update):
         try:
@@ -43,23 +38,12 @@ class TelegramBot:
             bot.send_message(chat_id=update.message.chat_id, text=ema)
 
     @staticmethod
-    def help(bot, update):
-        bot.send_message(chat_id=update.message.chat_id, text='help')
-
-    @staticmethod
     def error(bot, update, err):
         logger.warning('Update "%s" caused error "%s"' % (update, err))
 
     def start_timer(self):
-        if not self.worker:
-            self.sender.push('Запуск процесса')
-            self.worker = Worker()
-            self.timer.start()
-        else:
-            logger.info('Already started')
-
-    def stop_timer(self):
-        self.timer.stop()
+        self.sender.push('Запуск процесса')
+        self.timer.start()
 
     def timer_func(self):
         self.sync_timer(1)
