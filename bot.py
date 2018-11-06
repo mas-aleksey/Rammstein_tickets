@@ -13,7 +13,8 @@ class TelegramBot:
     def __init__(self, token):
         self.timer = RepeatEvery(1, self.timer_func)
         self.token = token
-        self.sender = None
+        self.sender = SendMsg(token, 134751583)
+        time.sleep(15)
         self.worker = None
         self.updater = Updater(token=token)
         self.dp = self.updater.dispatcher
@@ -28,12 +29,9 @@ class TelegramBot:
         self.dp.add_handler(CommandHandler('help', self.help))
         self.dp.add_handler(CommandHandler('ema', self.show_ema))
         self.dp.add_error_handler(self.error)
-        time.sleep(15)
 
     def start(self, bot, update):
-        if not self.sender:
-            self.sender = SendMsg(self.token, update.message.chat_id)
-        bot.send_message(chat_id=update.message.chat_id, text=str(update.message.chat_id))
+        bot.send_message(chat_id=update.message.chat_id, text='start')
 
     def show_ema(self, bot, update):
         try:
@@ -54,7 +52,7 @@ class TelegramBot:
 
     def start_timer(self):
         if not self.worker:
-            logger.info('Start process')
+            self.sender.push('Запуск процесса')
             self.worker = Worker()
             self.timer.start()
         else:
