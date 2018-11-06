@@ -12,7 +12,7 @@ class Worker:
         self.pair = 'BTCUSD'
         self.gateway = DB()
         self.ema_dict = EmaModule(self.gateway, self.get_last_price(self.pair))
-        self.strategies = StrategyModule(self.gateway)
+        #self.strategies = StrategyModule(self.gateway)
 
     def process(self):
         price = self.get_last_price(self.pair)
