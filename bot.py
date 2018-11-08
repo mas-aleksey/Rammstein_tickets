@@ -11,7 +11,6 @@ logger = logging.getLogger('Telegram_Bot')
 
 class TelegramBot:
     def __init__(self, token):
-        time.sleep(15)
         self.token = token
         self.timer = RepeatEvery(1, self.timer_func)
         self.sender = SendMsg(token, 134751583)
@@ -33,13 +32,11 @@ class TelegramBot:
         bot.send_message(chat_id=update.message.chat_id, text=str(update.message.chat_id))
 
     def show(self, bot, update):
-        try:
-            status = self.worker.status()
-        except Exception as e:
-            logger.error('get status error {}'.format(e))
-            bot.send_message(chat_id=update.message.chat_id, text='get status error')
-        else:
+        status = self.worker.status()
+        if status:
             bot.send_message(chat_id=update.message.chat_id, text=status)
+        else:
+            bot.send_message(chat_id=update.message.chat_id, text='none')
 
     @staticmethod
     def error(bot, update, err):
