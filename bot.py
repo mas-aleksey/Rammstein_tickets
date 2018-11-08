@@ -32,7 +32,9 @@ class TelegramBot:
         bot.send_message(chat_id=update.message.chat_id, text=str(update.message.chat_id))
 
     def show(self, bot, update):
+        logger.info('show')
         status = self.worker.status()
+        logger.info('{}'.format(status))
         if status:
             bot.send_message(chat_id=update.message.chat_id, text=status)
         else:
