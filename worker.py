@@ -22,7 +22,6 @@ class Worker:
         soup = BeautifulSoup(html, 'html.parser')
         sizes = soup.find_all('div', class_='fast-booking-font-switch')
         text = sizes[1].text
-        logger.info('{}'.format(text))
         if 'билетов' in text:
             return None
         else:
