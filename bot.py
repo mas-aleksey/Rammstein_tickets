@@ -15,7 +15,7 @@ class TelegramBot:
         self.token = token
         self.timer = RepeatEvery(1, self.timer_func)
         self.sender = SendMsg(token, 134751583)
-        self.worker = Worker(self.sender)
+        self.worker = Worker()
         self.updater = Updater(token=token)
         self.add_bot_handlers()
         self.start_timer()
@@ -25,17 +25,21 @@ class TelegramBot:
 
     def add_bot_handlers(self):
         dp = self.updater.dispatcher
-        dp.add_handler(CommandHandler('ema', self.show_ema))
+        dp.add_handler(CommandHandler('show', self.show))
+        dp.add_handler(CommandHandler('start', self.start))
         dp.add_error_handler(self.error)
 
-    def show_ema(self, bot, update):
+    def start(self, bot, update):
+        bot.send_message(chat_id=update.message.chat_id, text=str(update.message.chat_id))
+
+    def show(self, bot, update):
         try:
-            ema = self.worker.return_ema_format()
+            status = self.worker.status()
         except Exception as e:
-            logger.error('get ema error {}'.format(e))
-            bot.send_message(chat_id=update.message.chat_id, text='error')
+            logger.error('get status error {}'.format(e))
+            bot.send_message(chat_id=update.message.chat_id, text='get status error')
         else:
-            bot.send_message(chat_id=update.message.chat_id, text=ema)
+            bot.send_message(chat_id=update.message.chat_id, text=status)
 
     @staticmethod
     def error(bot, update, err):
@@ -47,7 +51,9 @@ class TelegramBot:
 
     def timer_func(self):
         self.sync_timer(1)
-        self.worker.process()
+        result = self.worker.status()
+        if result:
+            self.sender.push(result)
 
     @staticmethod
     def sync_timer(sec):

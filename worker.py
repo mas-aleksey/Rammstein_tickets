@@ -1,39 +1,28 @@
 import requests
 import logging
-from gateway import DB
-from ema import EmaModule
-from strat_control import StrategyModule
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger('Worker')
 
 
 class Worker:
-    def __init__(self, bot):
-        self.telega = bot
-        self.pair = 'BTCUSD'
-        self.gateway = DB()
-        self.ema_dict = EmaModule(self.gateway, self.get_last_price(self.pair))
-        #self.strategies = StrategyModule(self.gateway)
+    def __init__(self):
+        self.url = 'https://www.parter.ru/event/rammstein-europe-stadium-tour-2019-втб-аренадинамо-центральный-стадион-11321917/?affiliate=ONE'
 
-    def process(self):
+    def status(self):
         try:
-            price = self.get_last_price(self.pair)
-            new_ema = self.ema_dict.update(price)
-            #self.strategies.process(new_ema)
+            r = requests.get(self.url)
         except Exception as e:
-            logger.error('Worker process error: {}'.format(e))
-
-    def return_ema_format(self):
-        ema = self.ema_dict.get()
-        return '\n'.join('{}: {}'.format(*p) for p in ema.items())
+            logger.error('request error: {}'.format(e))
+        else:
+            return self.get_tiket(r.text)
 
     @staticmethod
-    def get_last_price(pair):
-        try:
-            url = 'https://api.bitfinex.com/v1/pubticker/{}'.format(pair)
-            response = requests.request("GET", url)
-            last_price = float(response.json()['last_price'])
-        except Exception as e:
-            logger.error("In func: get_last_price for pair %s: %s" % pair, e)
+    def get_tiket(html):
+        soup = BeautifulSoup(html, 'html.parser')
+        sizes = soup.find_all('div', class_='fast-booking-font-switch')
+        text = sizes[1].text
+        if 'билетов' in text:
+            return None
         else:
-            return last_price
+            return text
