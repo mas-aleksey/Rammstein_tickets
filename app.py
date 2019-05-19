@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
-    TelegramBot('421756283:AAFMiDEYT3bEQ5y07D1GitwBejbjynpIN7c')
+    TelegramBot('####:####')
 
 
 if __name__ == '__main__':
